@@ -1,7 +1,6 @@
 package call_test
 
 import (
-	"github.com/libmonsoon-dev/go-lib/builtintools"
 	"github.com/libmonsoon-dev/go-lib/call"
 	"testing"
 )
@@ -29,10 +28,10 @@ func BenchmarkArgsGrow10(b *testing.B) {
 func BenchmarkArgsGrowPool(b *testing.B) {
 	b.ReportAllocs()
 
-	var args call.Args
+	var args *call.Args
 	for i := 0; i < b.N; i++ {
-		args = builtintools.AcquireAnySlice()
+		args = call.AcquireArgs()
 		args.Grow(10)
-		builtintools.ReleaseAnySlice(args)
+		call.ReleaseArgs(args)
 	}
 }

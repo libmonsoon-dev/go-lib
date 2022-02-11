@@ -10,7 +10,7 @@ type ChainConfig struct {
 }
 
 func NewChain(conf ChainConfig) *Chain {
-	conf.Args = builtintools.AcquireAnySlice()
+	conf.Args = *builtintools.AcquireAnySlice()
 
 	return &Chain{
 		args: conf.Args,

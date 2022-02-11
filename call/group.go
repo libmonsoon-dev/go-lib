@@ -92,7 +92,7 @@ func (g *Group) Make(errorMessage string, fn func() (any, error)) *Group {
 		defer g.resultLock.Unlock()
 
 		if g.args == nil {
-			g.args = builtintools.AcquireAnySlice()
+			g.args = *builtintools.AcquireAnySlice()
 		}
 		g.args.Grow(int(index) + 1)
 		g.args[index] = result

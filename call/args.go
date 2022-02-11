@@ -2,7 +2,6 @@ package call
 
 import (
 	"fmt"
-	"github.com/libmonsoon-dev/go-lib/builtintools"
 	"strings"
 )
 
@@ -48,7 +47,5 @@ func (a *Args) Copy() Args {
 func (a *Args) grow(n int) {
 	next := make(Args, len(*a), 2*cap(*a)+n)
 	copy(next, *a)
-	a.Reset()
-	builtintools.ReleaseAnySlice(*a)
 	*a = next
 }

@@ -7,7 +7,7 @@ import (
 
 var chainsPool = sync.Pool{New: func() interface{} {
 	return NewChain(ChainConfig{
-		Args: builtintools.AcquireAnySlice(),
+		Args: *builtintools.AcquireAnySlice(),
 	})
 }}
 
@@ -31,4 +31,11 @@ func AcquireGroup() *Group {
 func ReleaseGroup(val *Group) {
 	val.Reset()
 	groupPool.Put(val)
+}
+
+func AcquireArgs() *Args {
+	return (*Args)(builtintools.AcquireAnySlice())
+}
+func ReleaseArgs(val *Args) {
+	builtintools.ReleaseAnySlice((*[]any)(val))
 }
