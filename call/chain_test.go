@@ -2,10 +2,11 @@ package call_test
 
 import (
 	"fmt"
-	"github.com/libmonsoon-dev/go-lib/call"
 	"io"
 	"reflect"
 	"testing"
+
+	"github.com/libmonsoon-dev/go-lib/call"
 )
 
 func TestChainDo(t *testing.T) {

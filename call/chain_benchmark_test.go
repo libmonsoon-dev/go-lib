@@ -1,8 +1,9 @@
 package call_test
 
 import (
-	"github.com/libmonsoon-dev/go-lib/call"
 	"testing"
+
+	"github.com/libmonsoon-dev/go-lib/call"
 )
 
 var preventingInliningChain *call.Chain

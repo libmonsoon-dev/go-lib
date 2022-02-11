@@ -2,8 +2,9 @@ package call_test
 
 import (
 	"fmt"
-	"github.com/libmonsoon-dev/go-lib/call"
 	"io"
+
+	"github.com/libmonsoon-dev/go-lib/call"
 )
 
 func ExampleChain() {

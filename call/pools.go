@@ -1,8 +1,9 @@
 package call
 
 import (
-	"github.com/libmonsoon-dev/go-lib/builtintools"
 	"sync"
+
+	"github.com/libmonsoon-dev/go-lib/builtintools"
 )
 
 var chainsPool = sync.Pool{New: func() interface{} {

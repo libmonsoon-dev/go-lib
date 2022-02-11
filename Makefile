@@ -20,7 +20,10 @@ test:
 bench:
 	$(GO) test -bench=. $(PACKAGES)
 
-pre-commit: .git/hooks/pre-commit dependency lint build test
+imports:
+	 find -name "*.go" -not -path "./vendor/*" -exec goimports -local github.com/libmonsoon-dev/go-lib -w {} \;
+
+pre-commit: .git/hooks/pre-commit imports dependency lint build test
 	echo "Done"
 
 .git/hooks/pre-commit:

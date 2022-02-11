@@ -2,11 +2,13 @@ package call
 
 import (
 	"context"
+	"sync"
+
+	"golang.org/x/sync/errgroup"
+
 	"github.com/libmonsoon-dev/go-lib/async"
 	"github.com/libmonsoon-dev/go-lib/builtintools"
 	"github.com/libmonsoon-dev/go-lib/errutils"
-	"golang.org/x/sync/errgroup"
-	"sync"
 )
 
 type GroupConfig struct {
