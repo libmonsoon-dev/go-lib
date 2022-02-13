@@ -21,7 +21,7 @@ func ExampleChain() {
 
 	// functions evocations:
 	callChain.
-		MakeFunc("new foo", func() (any, error) { return NewFoo() }).
+		MakeFunc("new foo", call.MakeFuncAdapter(NewFoo)).
 		MakeFunc("new bar", func() (any, error) { return NewBar(getFoo()) }).
 		MakeFunc("new baz", func() (any, error) {
 			foo := getFoo()
@@ -29,7 +29,7 @@ func ExampleChain() {
 
 			return NewBaz(foo, bar)
 		}).
-		MakeFunc("second foo", func() (any, error) { return NewFoo() }).
+		MakeFunc("second foo", call.MakeFuncAdapter(NewFoo)).
 		DoFunc("return first error", func() error { return io.EOF }).
 		MakeFunc("unreachable", func() (any, error) { return NewBar(nil) })
 
