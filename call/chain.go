@@ -23,62 +23,46 @@ type Chain struct {
 	err  error
 }
 
-func (c *Chain) Do(errorMessage string, fn func() error) *Chain {
+func (c *Chain) Do(args DoArgs) Manager {
 	if c.err != nil {
 		return c
 	}
 
-	if c.err = fn(); c.err != nil {
-		c.err = fmt.Errorf(errorMessage+": %w", c.err) // TODO: errors wrap method that handle input nil error
+	err := c.getDoFunc(args)()
+	if err != nil {
+		c.err = fmt.Errorf(args.GetErrorMessage()+": %w", err)
 	}
 
 	return c
 }
 
-func (c *Chain) Make(errorMessage string, fn func() (any, error)) *Chain {
+func (c *Chain) Make(args MakeArgs[any]) Manager {
 	if c.err != nil {
 		return c
 	}
 
-	result, err := fn()
+	result, err := c.getMakeFunc(args)()
 	if err != nil {
-		c.err = fmt.Errorf(errorMessage+": %w", err)
+		c.err = fmt.Errorf(args.GetErrorMessage()+": %w", err)
 	}
 	c.args = append(c.args, result)
 
 	return c
 }
 
-func (c *Chain) DoGroup(errorMessage string, fn func(*Group)) *Chain {
-	c.Do(errorMessage, func() (err error) {
-		group := AcquireGroup()
-		defer ReleaseGroup(group)
-
-		fn(group)
-		return group.GetError()
-	})
-
-	return c
+func (c *Chain) DoFunc(errorMessage string, fn DoFunc) Manager {
+	return c.Do(DoArgs{ErrorMessage: errorMessage, Func: fn})
 }
 
-func (c *Chain) MakeGroup(errorMessage string, fn func(*Group)) *Chain {
-	c.Make(errorMessage, func() (any, error) {
-		group := AcquireGroup()
-		defer ReleaseGroup(group)
-
-		fn(group)
-		result, err := group.Result()
-		return result.Copy(), err
-	})
-
-	return c
+func (c *Chain) MakeFunc(errorMessage string, fn MakeFunc[any]) Manager {
+	return c.Make(MakeArgs[any]{ErrorMessage: errorMessage, Func: fn})
 }
 
 func (c *Chain) GetArgs() Args {
 	return c.args
 }
 
-func (c *Chain) SetArgs(args Args) *Chain {
+func (c *Chain) SetArgs(args Args) Manager {
 	c.args = args
 
 	return c
@@ -96,3 +80,60 @@ func (c *Chain) Reset() {
 	c.args.Reset()
 	c.err = nil
 }
+
+func (c *Chain) getDoFunc(args DoArgs) (fn DoFunc) {
+	fn = args.GetFunc()
+	if fn != nil {
+		return
+	}
+
+	if args.GroupFunc != nil {
+		return func() (err error) {
+			group := AcquireGroup()
+			defer ReleaseGroup(group)
+
+			args.GroupFunc(group)
+			return group.GetError()
+		}
+	}
+
+	if args.ChainFunc != nil {
+		return func() error {
+			args.ChainFunc(c)
+			return c.GetError()
+		}
+	}
+
+	panic("Invalid args")
+}
+
+func (c *Chain) getMakeFunc(args MakeArgs[any]) (fn MakeFunc[any]) {
+	fn = args.GetFunc()
+	if fn != nil {
+		return
+	}
+
+	if args.GroupFunc != nil {
+		return func() (any, error) {
+			group := AcquireGroup()
+			defer ReleaseGroup(group)
+
+			args.GroupFunc(group)
+			result, err := group.GetResult()
+			return result.Copy(), err
+		}
+	}
+
+	if args.ChainFunc != nil {
+		return func() (any, error) {
+			args.ChainFunc(c)
+			return c.GetResult()
+		}
+	}
+
+	panic("Invalid args")
+}
+
+var _ Manager = (*Chain)(nil)
+
+type ChainFunc func(*Chain)
