@@ -51,11 +51,30 @@ func (c *Chain) Make(args MakeArgs[any]) Manager {
 }
 
 func (c *Chain) DoFunc(errorMessage string, fn DoFunc) Manager {
-	return c.Do(DoArgs{ErrorMessage: errorMessage, Func: fn})
+	if c.err != nil {
+		return c
+	}
+
+	err := fn()
+	if err != nil {
+		c.err = fmt.Errorf(errorMessage+": %w", err)
+	}
+
+	return c
 }
 
 func (c *Chain) MakeFunc(errorMessage string, fn MakeFunc[any]) Manager {
-	return c.Make(MakeArgs[any]{ErrorMessage: errorMessage, Func: fn})
+	if c.err != nil {
+		return c
+	}
+
+	result, err := fn()
+	if err != nil {
+		c.err = fmt.Errorf(errorMessage+": %w", err)
+	}
+	c.args = append(c.args, result)
+
+	return c
 }
 
 func (c *Chain) GetArgs() Args {
