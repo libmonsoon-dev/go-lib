@@ -10,20 +10,10 @@ import (
 )
 
 func TestChainDo(t *testing.T) {
-	type doCallsArgs struct {
-		errorMessage string
-		fn           func() error
-	}
-
-	type makeCallsArgs struct {
-		errorMessage string
-		fn           func() (any, error)
-	}
-
 	type test struct {
 		chain          *call.Chain
-		doCallsArgs    []doCallsArgs
-		makeCallsArgs  []makeCallsArgs
+		doCallsArgs    []call.DoArgs
+		makeCallsArgs  []call.MakeArgs[any]
 		expectedErr    error
 		expectedResult call.Args
 	}
@@ -31,26 +21,26 @@ func TestChainDo(t *testing.T) {
 	tests := []test{
 		{
 			chain: call.NewChain(call.ChainConfig{}),
-			doCallsArgs: []doCallsArgs{
-				{"step 1", emptyFunc},
-				{"step 2", emptyFunc},
-				{"step 3", emptyFunc},
+			doCallsArgs: []call.DoArgs{
+				{ErrorMessage: "step 1", Func: emptyFunc},
+				{ErrorMessage: "step 2", Func: emptyFunc},
+				{ErrorMessage: "step 3", Func: emptyFunc},
 			},
 		},
 		{
 			chain: call.AcquireChain(),
-			doCallsArgs: []doCallsArgs{
-				{"step 1", emptyFunc},
-				{"step 2", emptyFunc},
-				{"step 3", emptyFunc},
+			doCallsArgs: []call.DoArgs{
+				{ErrorMessage: "step 1", Func: emptyFunc},
+				{ErrorMessage: "step 2", Func: emptyFunc},
+				{ErrorMessage: "step 3", Func: emptyFunc},
 			},
 		},
 		{
 			chain: &call.Chain{},
-			doCallsArgs: []doCallsArgs{
-				{"step 1", emptyFunc},
-				{"step 2", emptyFunc},
-				{"step 3", emptyFunc},
+			doCallsArgs: []call.DoArgs{
+				{ErrorMessage: "step 1", Func: emptyFunc},
+				{ErrorMessage: "step 2", Func: emptyFunc},
+				{ErrorMessage: "step 3", Func: emptyFunc},
 			},
 		},
 		func() test {
@@ -59,11 +49,11 @@ func TestChainDo(t *testing.T) {
 
 			return test{
 				chain: chain,
-				makeCallsArgs: []makeCallsArgs{
-					{"step 1", func() (any, error) { return NewFoo() }},
-					{"step 2", func() (any, error) { return NewBar(getFoo()) }},
-					{"step 3", returnEOF},
-					{"unreachable", func() (any, error) { panic("should not be called") }},
+				makeCallsArgs: []call.MakeArgs[any]{
+					{ErrorMessage: "step 1", Func: func() (any, error) { return NewFoo() }},
+					{ErrorMessage: "step 2", Func: func() (any, error) { return NewBar(getFoo()) }},
+					{ErrorMessage: "step 3", Func: returnEOF},
+					{ErrorMessage: "unreachable", Func: func() (any, error) { panic("should not be called") }},
 				},
 				expectedResult: func() call.Args {
 					foo, _ := NewFoo()
@@ -79,11 +69,11 @@ func TestChainDo(t *testing.T) {
 
 			return test{
 				chain: chain,
-				makeCallsArgs: []makeCallsArgs{
-					{"step 1", func() (any, error) { return NewFoo() }},
-					{"step 2", func() (any, error) { return NewBar(getFoo()) }},
-					{"step 3", returnEOF},
-					{"unreachable", func() (any, error) { panic("should not be called") }},
+				makeCallsArgs: []call.MakeArgs[any]{
+					{ErrorMessage: "step 1", Func: func() (any, error) { return NewFoo() }},
+					{ErrorMessage: "step 2", Func: func() (any, error) { return NewBar(getFoo()) }},
+					{ErrorMessage: "step 3", Func: returnEOF},
+					{ErrorMessage: "unreachable", Func: func() (any, error) { panic("should not be called") }},
 				},
 				expectedResult: func() call.Args {
 					foo, _ := NewFoo()
@@ -99,11 +89,11 @@ func TestChainDo(t *testing.T) {
 
 			return test{
 				chain: chain,
-				makeCallsArgs: []makeCallsArgs{
-					{"step 1", func() (any, error) { return NewFoo() }},
-					{"step 2", func() (any, error) { return NewBar(getFoo()) }},
-					{"step 3", returnEOF},
-					{"unreachable", func() (any, error) { panic("should not be called") }},
+				makeCallsArgs: []call.MakeArgs[any]{
+					{ErrorMessage: "step 1", Func: func() (any, error) { return NewFoo() }},
+					{ErrorMessage: "step 2", Func: func() (any, error) { return NewBar(getFoo()) }},
+					{ErrorMessage: "step 3", Func: returnEOF},
+					{ErrorMessage: "unreachable", Func: func() (any, error) { panic("should not be called") }},
 				},
 				expectedResult: func() call.Args {
 					foo, _ := NewFoo()
@@ -118,11 +108,11 @@ func TestChainDo(t *testing.T) {
 	for i, test := range tests {
 		t.Run(fmt.Sprintf("#%d", i+1), func(t *testing.T) {
 			for _, args := range test.doCallsArgs {
-				test.chain.Do(args.errorMessage, args.fn)
+				test.chain.Do(args)
 			}
 
 			for _, args := range test.makeCallsArgs {
-				test.chain.Make(args.errorMessage, args.fn)
+				test.chain.Make(args)
 			}
 
 			if !reflect.DeepEqual(test.expectedErr, test.chain.GetError()) {

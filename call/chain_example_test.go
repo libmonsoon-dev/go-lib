@@ -21,17 +21,17 @@ func ExampleChain() {
 
 	// functions evocations:
 	callChain.
-		Make("new foo", func() (any, error) { return NewFoo() }).
-		Make("new bar", func() (any, error) { return NewBar(getFoo()) }).
-		Make("new baz", func() (any, error) {
+		MakeFunc("new foo", func() (any, error) { return NewFoo() }).
+		MakeFunc("new bar", func() (any, error) { return NewBar(getFoo()) }).
+		MakeFunc("new baz", func() (any, error) {
 			foo := getFoo()
 			bar := getBar()
 
 			return NewBaz(foo, bar)
 		}).
-		Make("second foo", func() (any, error) { return NewFoo() }).
-		Do("return first error", func() error { return io.EOF }).
-		Make("unreachable", func() (any, error) { return NewBar(nil) })
+		MakeFunc("second foo", func() (any, error) { return NewFoo() }).
+		DoFunc("return first error", func() error { return io.EOF }).
+		MakeFunc("unreachable", func() (any, error) { return NewBar(nil) })
 
 	// Output: Arguments: [*call_test.foo, *call_test.bar, *call_test.baz, *call_test.foo]
 	// Error: "return first error: EOF"
