@@ -41,6 +41,10 @@ func (a *Args) Grow(n int) {
 }
 
 func (a *Args) Copy() Args {
+	if a == nil {
+		return nil
+	}
+
 	return append(Args(nil), *a...)
 }
 
