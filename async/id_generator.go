@@ -19,3 +19,7 @@ func (c *IdGenerator) Generate() int32 {
 func (c *IdGenerator) Reset() {
 	atomic.StoreInt32(&c.counter, 0)
 }
+
+func (c *IdGenerator) Current() int32 {
+	return atomic.LoadInt32(&c.counter)
+}
