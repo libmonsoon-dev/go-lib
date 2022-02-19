@@ -67,9 +67,13 @@ type Archiver struct {
 func (a *Archiver) Reset() {
 	a.conf = ArchiveConfig{}
 
-	// TODO: reset slices to zero length
-	a.closers = nil
-	a.buf = nil
+	for i := range a.closers {
+		a.closers[i] = nil
+	}
+	a.closers = a.closers[:0]
+	for i := range a.buf {
+		a.buf[i] = 0
+	}
 
 	a.zipCompressor = nil
 	a.tarCompressor = nil
