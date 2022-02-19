@@ -22,7 +22,8 @@ const (
 
 type ArchiveConfig struct {
 	ArchiveType
-	ZipMethod uint16
+	ZipMethod  uint16
+	BufferSize int
 }
 
 func DefaultZipConfig() ArchiveConfig {
@@ -112,7 +113,10 @@ func (a *Archiver) ToArchive(fileSystem fs.FS, root string, config ArchiveConfig
 
 func (a *Archiver) initBuf() {
 	if a.buf == nil {
-		a.buf = make([]byte, bytes.MB)
+		if a.conf.BufferSize == 0 {
+			a.conf.BufferSize = bytes.MB
+		}
+		a.buf = make([]byte, a.conf.BufferSize)
 	}
 }
 
