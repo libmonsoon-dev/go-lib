@@ -44,9 +44,8 @@ func DefaultTarConfig() ArchiveConfig {
 }
 
 func toArchive(fileSystem fs.FS, root string, config ArchiveConfig, output io.Writer) error {
-	//a := AcquireArchiver()
-	//defer ReleaseArchiver(a)
-	a := NewArchiver()
+	a := AcquireArchiver()
+	defer ReleaseArchiver(a)
 
 	return a.ToArchive(fileSystem, root, config, output)
 }
