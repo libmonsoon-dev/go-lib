@@ -26,6 +26,8 @@ type ArchiveConfig struct {
 	BufferSize int
 }
 
+const clearBufferOnReset = false
+
 func DefaultZipConfig() ArchiveConfig {
 	return ArchiveConfig{ArchiveType: Zip, ZipMethod: zip.Deflate}
 }
@@ -72,8 +74,10 @@ func (a *Archiver) Reset() {
 		a.closers[i] = nil
 	}
 	a.closers = a.closers[:0]
-	for i := range a.buf {
-		a.buf[i] = 0
+	if clearBufferOnReset {
+		for i := range a.buf {
+			a.buf[i] = 0
+		}
 	}
 
 	a.zipCompressor = nil
