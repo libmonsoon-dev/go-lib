@@ -2,10 +2,11 @@ package mainutils
 
 import (
 	"context"
-	"github.com/libmonsoon-dev/go-lib/async/errgroup"
-	"github.com/libmonsoon-dev/go-lib/errutils"
 	"os/signal"
 	"syscall"
+
+	"github.com/libmonsoon-dev/go-lib/async/errgroup"
+	"github.com/libmonsoon-dev/go-lib/errutils"
 )
 
 func init() {
