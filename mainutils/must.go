@@ -1,27 +1,36 @@
 package mainutils
 
 func Must[T any](val T, err error) T {
-	check(err)
+	check(err, true)
 	return val
 }
 
 func Must2[A, B any](a A, b B, err error) (A, B) {
-	check(err)
+	check(err, true)
 	return a, b
 }
 
 func Must3[A, B, C any](a A, b B, c C, err error) (A, B, C) {
-	check(err)
+	check(err, true)
 	return a, b, c
 }
 
 func Check(err error) {
-	check(err)
+	check(err, true)
 }
 
-func check(err error) {
+func CheckBackgroundJobs() {
+	var err error
+
+	addBackgroundErrors(&err)
+	check(err, false)
+}
+
+func check(err error, waitBackground bool) {
 	if err != nil {
-		waitBackgroundJobs(&err)
+		if waitBackground {
+			terminateBackgroundJobs(&err)
+		}
 		DieFunc(err)
 	}
 }

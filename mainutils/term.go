@@ -7,12 +7,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/libmonsoon-dev/go-lib/async"
+	"golang.org/x/sync/errgroup"
 
-	"github.com/libmonsoon-dev/go-lib/async/errgroup"
+	"github.com/libmonsoon-dev/go-lib/async"
 )
 
-var TerminationTimeout = 5 * time.Second
+var (
+	TerminationTimeout = 5 * time.Second
+	IgnoreContextError = true
+)
 
 var (
 	ctx    context.Context
@@ -22,14 +25,14 @@ var (
 	runningJobs = async.NewSet[string]()
 )
 
-func waitBackgroundJobs(err *error) {
+func terminateBackgroundJobs(err *error) {
 	cancel()
 
 	oneOf := make(chan struct{}, 2)
 	go func() {
 		time.Sleep(TerminationTimeout)
 
-		addError(err, context.Cause(ctx))
+		addBackgroundErrors(err)
 		running := strings.Join(runningJobs.Values(), ", ")
 		addError(err, fmt.Errorf("termination %w: still running: [%v]", context.DeadlineExceeded, running))
 
@@ -37,8 +40,8 @@ func waitBackgroundJobs(err *error) {
 	}()
 
 	go func() {
-		addError(err, group.Wait())
-
+		group.Wait()
+		addBackgroundErrors(err)
 		oneOf <- struct{}{}
 	}()
 
@@ -46,10 +49,17 @@ func waitBackgroundJobs(err *error) {
 	return
 }
 
-func addError(out *error, err error) {
-	if errors.Is(err, context.Canceled) {
-		return
+func addBackgroundErrors(out *error) {
+	for {
+		select {
+		case err := <-errs:
+			addError(out, err)
+		default:
+			return
+		}
 	}
+}
 
+func addError(out *error, err error) {
 	*out = errors.Join(*out, err)
 }

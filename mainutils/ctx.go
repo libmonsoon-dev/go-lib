@@ -2,10 +2,12 @@ package mainutils
 
 import (
 	"context"
+	"errors"
 	"os/signal"
 	"syscall"
 
-	"github.com/libmonsoon-dev/go-lib/async/errgroup"
+	"golang.org/x/sync/errgroup"
+
 	"github.com/libmonsoon-dev/go-lib/errutils"
 )
 
@@ -31,12 +33,24 @@ func Context() context.Context {
 	return ctx
 }
 
+var errs = make(chan error, 1)
+
 func Go(name string, fn func(context.Context) error) {
 	runningJobs.Add(name)
 
 	group.Go(func() error {
-		defer runningJobs.Remove(name)
+		err := errutils.Wrap("background job "+name, fn(ctx))
+		runningJobs.Remove(name)
 
-		return errutils.Wrap("background job "+name, fn(ctx))
+		if IgnoreContextError && isContextError(err) {
+			return err
+		}
+
+		errs <- err
+		return err
 	})
+}
+
+func isContextError(err error) bool {
+	return ctx.Err() != nil && errors.Is(err, ctx.Err())
 }
