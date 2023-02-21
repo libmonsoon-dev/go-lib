@@ -21,6 +21,7 @@ func Check(err error) {
 
 func check(err error) {
 	if err != nil {
+		waitBackgroundJobs(&err)
 		DieFunc(err)
 	}
 }
