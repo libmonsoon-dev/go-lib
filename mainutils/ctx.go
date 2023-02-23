@@ -35,7 +35,7 @@ func Context() context.Context {
 	return ctx
 }
 
-var errs = make(chan error, 1)
+var errs = make(chan error)
 
 type BackgroundFunction func(context.Context) error
 
@@ -64,7 +64,7 @@ func GoNamed(name string, fn BackgroundFunction) {
 			return err
 		}
 
-		errs <- err
+		go func() { errs <- err }()
 		return err
 	})
 }
