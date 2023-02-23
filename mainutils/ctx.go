@@ -3,7 +3,9 @@ package mainutils
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os/signal"
+	"runtime"
 	"syscall"
 
 	"golang.org/x/sync/errgroup"
@@ -35,7 +37,23 @@ func Context() context.Context {
 
 var errs = make(chan error, 1)
 
-func Go(name string, fn func(context.Context) error) {
+type BackgroundFunction func(context.Context) error
+
+func Go(fn BackgroundFunction) {
+	_, file, line, _ := runtime.Caller(1)
+	name := fmt.Sprintf("%v:%d", file, line)
+	for {
+		if !runningJobs.Has(name) {
+			break
+		}
+
+		name += "." //TODO
+	}
+
+	GoNamed(name, fn)
+}
+
+func GoNamed(name string, fn BackgroundFunction) {
 	runningJobs.Add(name)
 
 	group.Go(func() error {
