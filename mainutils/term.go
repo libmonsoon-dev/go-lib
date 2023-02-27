@@ -40,7 +40,7 @@ func terminateBackgroundJobs(err *error) {
 	}()
 
 	go func() {
-		group.Wait()
+		_ = group.Wait()
 		addBackgroundErrors(err)
 		oneOf <- struct{}{}
 	}()
