@@ -45,3 +45,8 @@ func (s *Set[T]) String() string {
 
 	return fmt.Sprint(s.m)
 }
+
+func (s *Set[T]) Has(val T) bool {
+	_, ok := s.m[val]
+	return ok
+}
