@@ -12,6 +12,27 @@ import (
 	"github.com/libmonsoon-dev/go-lib/bytes"
 )
 
+type ArchiveType int
+
+const (
+	Zip ArchiveType = iota
+	TarGz
+)
+
+type archiveConfig struct {
+	ArchiveType
+	ZipMethod  uint16
+	BufferSize int
+}
+
+func defaultZipConfig() archiveConfig {
+	return archiveConfig{ArchiveType: Zip, ZipMethod: zip.Deflate}
+}
+
+func defaultTarConfig() archiveConfig {
+	return archiveConfig{ArchiveType: TarGz}
+}
+
 func newArchiver() *archiver {
 	return &archiver{}
 }
@@ -73,7 +94,11 @@ func (a *archiver) ToArchive(fileSystem fs.FS, root string, config archiveConfig
 		return nil
 	})
 
-	return
+	if err != nil {
+		return fmt.Errorf("to archive: %w", err)
+	}
+
+	return nil
 }
 
 func (a *archiver) Close() (err error) {
