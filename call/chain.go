@@ -11,16 +11,22 @@ type ChainConfig struct {
 }
 
 func NewChain(conf ChainConfig) *Chain {
-	conf.Args = *builtintools.AcquireAnySlice()
-
-	return &Chain{
+	chain := &Chain{
 		args: conf.Args,
 	}
+
+	if chain.args == nil {
+		chain.args = *builtintools.AcquireAnySlice()
+		chain.argsFromPool = false
+	}
+
+	return chain
 }
 
 type Chain struct {
-	args Args
-	err  error
+	args         Args
+	argsFromPool bool
+	err          error
 }
 
 func (c *Chain) Do(args DoArgs) Manager {
