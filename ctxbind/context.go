@@ -53,7 +53,7 @@ func getContext(id int) context.Context {
 }
 
 func Deadline(id int) (deadline time.Time, ok bool) { return GetContext(id).Deadline() }
-func Done(id int) <-chan struct{}                   { return GetContext(id).Done() }
+func Done(id int)                                   { <-GetContext(id).Done() }
 func Err(id int) error                              { return GetContext(id).Err() }
 func Value(id int, key any) any                     { return GetContext(id).Value(key) }
 func CancelContext(id int)                          { GetCancelFunction(id)() }
