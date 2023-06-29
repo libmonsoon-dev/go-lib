@@ -22,6 +22,7 @@ func Check(err error) {
 func CheckBackgroundJobs() {
 	var err error
 
+	terminateBackgroundJobs(&err)
 	addBackgroundErrors(&err)
 	check(err, false)
 }
