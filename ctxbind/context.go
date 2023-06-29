@@ -23,16 +23,15 @@ func WithCancel(parentID int) (id int) {
 	contextMu.Lock()
 	defer contextMu.Unlock()
 
-	var has bool
-	for has || id == backgroundID {
+	var alreadyUsed bool
+	for alreadyUsed || id == backgroundID {
 		id = generateId()
-		_, has = contextMap[id]
+		_, alreadyUsed = contextMap[id]
 	}
 
 	contextMap[id], cancelMap[id] = context.WithCancel(getContext(parentID))
 	return id
 }
-
 
 func GetContext(id int) context.Context {
 	if id == backgroundID {
@@ -95,7 +94,7 @@ func GetCancelFunction(id int) context.CancelFunc {
 }
 
 func generateId() int {
-    TODO: add mutex locked assert
+	// TODO: add mutex locked assert
 	lastID++
 	return lastID
 }
