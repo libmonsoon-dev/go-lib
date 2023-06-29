@@ -8,6 +8,10 @@ import (
 
 type Point struct{ Latitude, Longitude Coordinate }
 
+func (p Point) String() string {
+	return fmt.Sprintf("%s, %s", p.Latitude, p.Longitude)
+}
+
 func (p Point) Point() orb.Point {
 	p.check()
 

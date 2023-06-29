@@ -1,8 +1,16 @@
 package geo
 
+import (
+	"fmt"
+)
+
 type DMS struct {
 	Degrees, Minutes, Seconds int
 	DirectionFiled            Direction
+}
+
+func (c DMS) String() string {
+	return fmt.Sprintf("%d° %d′ %d″ %c", c.Degrees, c.Minutes, c.Seconds, c.DirectionFiled.Rune())
 }
 
 func (c DMS) Direction() Direction {
