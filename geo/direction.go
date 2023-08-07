@@ -1,6 +1,6 @@
 package geo
 
-//go:generate stringer  -type Direction -trimprefix Direction
+//go:generate stringer -type Direction -trimprefix Direction
 type Direction byte
 
 const (
