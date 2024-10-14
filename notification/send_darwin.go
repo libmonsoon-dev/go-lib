@@ -4,7 +4,7 @@ import (
 	"context"
 	"os/exec"
 
-	"github.com/deckarep/gosx-notifier"
+	gosxnotifier "github.com/deckarep/gosx-notifier"
 )
 
 func (n Notification) newSendCommand(ctx context.Context, title, body string) (*exec.Cmd, func(), error) {
