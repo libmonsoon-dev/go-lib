@@ -3,9 +3,9 @@ package notification
 import (
 	"context"
 	"fmt"
-	"strconv"
-	"strings"
 	"time"
+
+	"github.com/libmonsoon-dev/go-lib/exec"
 )
 
 type UrgencyLevel byte
@@ -40,23 +40,6 @@ func (n Notification) Send(ctx context.Context, title, body string) error {
 		return fmt.Errorf("build command: %w", err)
 	}
 
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		args := append([]string{cmd.Args[0]}, quoteSlice(cmd.Args[1:])...)
-		if len(output) > 0 {
-			return fmt.Errorf("execute %s: %s: %w", strings.Join(args, " "), string(output), err)
-		}
-		return fmt.Errorf("execute %s: %w", strings.Join(args, " "), err)
-	}
+	_, _, err = exec.RunCommand(cmd)
 	return err
-}
-
-func quoteSlice(args []string) []string {
-	result := make([]string, len(args))
-
-	for i := range args {
-		result[i] = strconv.Quote(args[i])
-	}
-
-	return result
 }
