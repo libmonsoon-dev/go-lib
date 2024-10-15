@@ -1,7 +1,13 @@
 package list
 
-func NewList[T any]() *List[T] {
-	return &List[T]{}
+func NewList[T any](args ...T) *List[T] {
+	l := &List[T]{}
+
+	for _, val := range args {
+		l.Append(val)
+	}
+
+	return l
 }
 
 type List[T any] struct {
