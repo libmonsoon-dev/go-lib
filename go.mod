@@ -15,8 +15,6 @@ require (
 require (
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	golang.org/x/mobile v0.0.0-20241004191011-08a83c5af9f8 // indirect
-	golang.org/x/mod v0.21.0 // indirect
-	golang.org/x/tools v0.26.0 // indirect
 )
 
 replace gopkg.in/toast.v1 => github.com/libmonsoon-dev/toast v0.0.0-20241014200443-d0a04cde6d5c
