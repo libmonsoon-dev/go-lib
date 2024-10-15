@@ -31,7 +31,7 @@ func TestAndroid(t *testing.T) {
 	outputFileName := filepath.Join(os.TempDir(), strconv.FormatInt(rand.Int64(), 10)+".aar")
 	defer os.Remove(outputFileName)
 
-	_, _, err := exec.Run(ctx, "gomobile", "bind", "-v", "-target", "android", "-o", outputFileName, "./testdata/gomobile")
+	_, _, err := exec.Run(ctx, "gomobile", "bind", "-v", "-target", "android", "-androidapi", "21", "-o", outputFileName, "./testdata/gomobile")
 	if err != nil {
 		t.Fatal(err)
 	}
