@@ -1,6 +1,11 @@
 package errors
 
-import "fmt"
+import (
+	"fmt"
+	"log/slog"
+	"strconv"
+	"strings"
+)
 
 // Format wraps err with fmt.Errorf if err is not nil
 // If err is nil returns nil
@@ -9,7 +14,13 @@ func Format(err error, format string, args ...any) error {
 		return nil
 	}
 
-	return fmt.Errorf(format, append(args, err)...)
+	if strings.Contains(format, "%w") {
+		args = append(args, err)
+	} else {
+		slog.Debug("format " + strconv.Quote(format) + " not contains %w")
+	}
+
+	return fmt.Errorf(format, args...)
 }
 
 // Appendf returns an error that wraps the given errors.

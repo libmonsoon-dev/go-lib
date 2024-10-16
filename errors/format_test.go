@@ -38,6 +38,15 @@ func TestFormat(t *testing.T) {
 			},
 			expected: fmt.Errorf("do somthing with str %s: %w", "some string", io.EOF),
 		},
+		{
+			name: "Format don't contains %w",
+			args: args{
+				err:    io.EOF,
+				format: "new error message: %d",
+				args:   []any{42},
+			},
+			expected: fmt.Errorf("new error message: %d", 42),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
