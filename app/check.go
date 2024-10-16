@@ -17,6 +17,10 @@ func Must[T any](val T, err error) T {
 	return val
 }
 
+func Checkf(err error, format string, args ...any) {
+	Check(errors.Format(err, format, args...))
+}
+
 func Check(err error) {
 	if err != nil {
 		slog.Error(err.Error())
