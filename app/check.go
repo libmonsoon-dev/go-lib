@@ -3,7 +3,14 @@ package app
 import (
 	"log/slog"
 	"os"
+
+	"github.com/libmonsoon-dev/go-lib/errors"
 )
+
+func Mustf[T any](val T, err error, format string, args ...any) T {
+	Check(errors.Format(err, format, args...))
+	return val
+}
 
 func Must[T any](val T, err error) T {
 	Check(err)
